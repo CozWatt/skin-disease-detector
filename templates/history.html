@@ -1,0 +1,28 @@
+<!-- templates/history.html -->
+{% extends "layout.html" %}
+{% block title %}Prediction History{% endblock %}
+{% block content %}
+<h2 class="text-center">Your Prediction History</h2>
+<table class="table table-bordered table-hover">
+  <thead class="table-dark">
+    <tr>
+      <th>Date</th>
+      <th>Image</th>
+      <th>Prediction</th>
+      <th>Confidence</th>
+      <th>PDF</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in history %}
+    <tr>
+      <td>{{ row['date'] }}</td>
+      <td><img src="{{ url_for('static', filename='uploads/' ~ row['image_path']) }}" height="60"></td>
+      <td>{{ row['result'] }}</td>
+      <td>{{ row['confidence'] }}%</td>
+      <td><a href="{{ url_for('download_pdf', id=row['id']) }}" class="btn btn-sm btn-outline-danger">Download</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

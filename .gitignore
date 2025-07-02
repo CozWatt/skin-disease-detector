@@ -1,0 +1,19 @@
+# Ignore model and data files
+*.h5
+*.zip
+*.csv
+*.pyc
+__pycache__/
+
+# Ignore dataset folders
+dataset/
+all_images/
+images_part_1/
+images_part_2/
+
+# Ignore uploaded image content
+static/uploads/
+
+# VSCode / IDE stuff
+.vscode/
+*.log

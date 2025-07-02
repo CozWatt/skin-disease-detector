@@ -1,0 +1,12 @@
+<!-- templates/index.html -->
+{% extends "layout.html" %}
+{% block title %}Upload Image{% endblock %}
+{% block content %}
+<h2 class="text-center">Upload Skin Image</h2>
+<form method="POST" action="{{ url_for('predict') }}" enctype="multipart/form-data" class="mx-auto" style="max-width: 500px;">
+  <div class="mb-3">
+    <input type="file" name="image" class="form-control" accept="image/*" required>
+  </div>
+  <button class="btn btn-primary w-100">Predict Disease</button>
+</form>
+{% endblock %}

@@ -1,0 +1,51 @@
+<!-- templates/dashboard.html -->
+{% extends "layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2 class="text-center">Prediction Statistics</h2>
+
+<div class="row">
+  <div class="col-md-6 mx-auto">
+    <canvas id="diseaseChart"></canvas>
+  </div>
+</div>
+
+<table class="table table-bordered table-striped mt-4">
+  <thead class="table-dark">
+    <tr>
+      <th>Disease</th>
+      <th>Count</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for label, count in stats %}
+    <tr>
+      <td>{{ label }}</td>
+      <td>{{ count }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a href="{{ url_for('home') }}" class="btn btn-secondary mt-3">Back</a>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const ctx = document.getElementById('diseaseChart').getContext('2d');
+  const diseaseChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: {{ stats|map(attribute=0)|list|tojson }},
+      datasets: [{
+        label: 'Prediction Counts',
+        data: {{ stats|map(attribute=1)|list|tojson }},
+        backgroundColor: [
+          '#007bff', '#28a745', '#dc3545', '#ffc107', '#6610f2', '#17a2b8', '#fd7e14'
+        ],
+        borderWidth: 1
+      }]
+    }
+  });
+</script>
+{% endblock %}

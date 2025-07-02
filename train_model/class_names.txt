@@ -1,0 +1,7 @@
+Actinic
+Basal
+Benign
+Dermatofibroma
+Melanocytic
+Melanoma
+Vascular
