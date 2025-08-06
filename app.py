@@ -6,20 +6,43 @@ from io import BytesIO
 import os
 import sqlite3
 import numpy as np
+import uuid
+import requests
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
-import uuid
 
 app = Flask(__name__)
 app.secret_key = 'an@s_secure_key_123456789!'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 
-# Load model and classes
-model = load_model('train_model/skin_model.h5')
-with open('train_model/class_names.txt', 'r') as f:
+# ---------------- MODEL SETUP ----------------
+MODEL_URL = "https://huggingface.co/cozwatt/skin-disease-detector/resolve/main/skin_model.h5"
+MODEL_DIR = "train_model"
+MODEL_PATH = os.path.join(MODEL_DIR, "skin_model.h5")
+CLASS_NAMES_PATH = os.path.join(MODEL_DIR, "class_names.txt")
+
+# Create model directory if it doesn't exist
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+# Download model if not already present
+def download_model():
+    if not os.path.exists(MODEL_PATH):
+        print("📥 Downloading model from Hugging Face...")
+        r = requests.get(MODEL_URL)
+        with open(MODEL_PATH, "wb") as f:
+            f.write(r.content)
+        print("✅ Model downloaded!")
+
+download_model()
+
+# Load the model
+model = load_model(MODEL_PATH)
+
+# Load class names
+with open(CLASS_NAMES_PATH, 'r') as f:
     class_names = [line.strip() for line in f]
 
-# --- Database Setup ---
+# ---------------- DATABASE INIT ----------------
 def init_db():
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
@@ -40,7 +63,7 @@ def init_db():
 
 init_db()
 
-# --- Routes ---
+# ---------------- ROUTES ----------------
 @app.route('/')
 def home():
     if 'user_id' in session:
@@ -113,7 +136,7 @@ def predict():
     confidence = round(100 * np.max(predictions), 2)
     result = class_names[np.argmax(predictions)]
 
-    # Save to DB and get prediction_id
+    # Save to DB
     conn = sqlite3.connect('database.db')
     c = conn.cursor()
     c.execute("INSERT INTO predictions (user_id, image_path, result, confidence, date) VALUES (?, ?, ?, ?, ?)",
@@ -192,4 +215,3 @@ if __name__ == '__main__':
         app.run(debug=True)
     except KeyboardInterrupt:
         print("\n👋 Server stopped by user.")
-
